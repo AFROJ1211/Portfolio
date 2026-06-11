@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career & Experience - Portfolio Admin</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* --- Design System Variables --- */
+        :root {
+            --primary-color: #6842EF;
+            --primary-light: #F4F1FE;
+            --primary-hover: #5534cc;
+            --bg-main: #F4F5F7;
+            --bg-sidebar: #FFFFFF;
+            --bg-input: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+            --danger-color: #EF4444;
+            --danger-light: #FEF2F2;
+            --sidebar-width: 280px;
+        }
+
+        /* --- Base Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Styling --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 24px 0;
+            box-shadow: 1px 0 10px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .brand-blank-space { height: 60px; }
+
+        .nav-menu {
+            padding: 0 16px;
+            flex-grow: 1;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 12px 16px 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9CA3AF;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item i { font-size: 20px; margin-right: 14px; transition: color 0.2s ease; }
+        .nav-item:hover { background-color: #F9FAFB; color: var(--text-main); }
+        .nav-item:hover i { color: var(--text-main); }
+        
+        .nav-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+        .nav-item.active i { color: var(--primary-color); }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: -16px; top: 50%; transform: translateY(-50%);
+            height: 24px; width: 4px; background-color: var(--primary-color); border-radius: 0 4px 4px 0;
+        }
+
+        .user-profile {
+            padding: 24px; border-top: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+        }
+        .user-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .breadcrumbs { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        
+        .header-actions { display: flex; gap: 12px; }
+
+        .btn-primary {
+            background-color: var(--primary-color); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-outline {
+            background-color: white; color: var(--text-main); border: 1px solid var(--border-light); padding: 10px 20px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-outline:hover { background-color: #F9FAFB; }
+
+        /* --- Experience Cards Container --- */
+        .experiences-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 900px;
+        }
+
+        /* --- Card Styling --- */
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background-color: #FCFDFF;
+        }
+
+        .card-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .card-title { font-size: 15px; font-weight: 600; }
+
+        /* Delete Button in Header */
+        .btn-icon-danger {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-icon-danger:hover {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* --- Form Elements --- */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row > .form-group { flex: 1; }
+        
+        /* 3 Column Grid for Top Row */
+        .grid-3-col {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: var(--bg-input);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <div class="brand-blank-space"></div>
+            <ul class="nav-menu">
+                <div class="nav-label">Page Management</div>
+                <li class="nav-item">
+                    <i class="ph ph-user"></i> <span class="menu-text">About me</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-wrench"></i> <span class="menu-text">What I do</span>
+                </li>
+                <!-- 3. My career and experience (Active) -->
+                <li class="nav-item active">
+                    <i class="ph ph-trend-up"></i> <span class="menu-text">My career & experience</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-folder-notch-open"></i> <span class="menu-text">My work</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-paper-plane-tilt"></i> <span class="menu-text">Contact</span>
+                </li>
+            </ul>
+        </div>
+        <div class="user-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=6842EF&color=fff" alt="Profile">
+            <div class="user-info">
+                <h4>System Admin</h4>
+                <p>admin@portfolio.com</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Right Main Content -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">Manage Experience & Timeline</h1>
+                <div class="breadcrumbs">
+                    <i class="ph ph-house"></i> Home 
+                    <span>/</span> Pages
+                    <span>/</span> <span style="color: var(--text-main);">My career & experience</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" id="add-experience-btn">
+                    <i class="ph ph-plus"></i> Add Experience
+                </button>
+                <button class="btn-primary">
+                    <i class="ph ph-floppy-disk"></i> Save Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- Container for all Experience Cards -->
+        <div class="experiences-container" id="experiences-container">
+            
+            <!-- Experience Item 1 -->
+            <div class="card experience-item">
+                <div class="card-header">
+                    <div class="card-title-wrapper">
+                        <div class="card-icon"><i class="ph ph-briefcase"></i></div>
+                        <h2 class="card-title">Experience Entry</h2>
+                    </div>
+                    <!-- Delete Button for this section -->
+                    <button class="btn-icon-danger delete-entry-btn" title="Delete Entry">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-row grid-3-col">
+                        <div class="form-group">
+                            <label class="form-label">Role Title</label>
+                            <input type="text" class="form-control" value="Learning Something New">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company / Subtitle</label>
+                            <input type="text" class="form-control" value="Self-Development">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <input type="text" class="form-control" value="NOW">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control">Continuously exploring emerging technologies, researching advanced AI systems, and pushing the boundaries of what's possible in tech.</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience Item 2 -->
+            <div class="card experience-item">
+                <div class="card-header">
+                    <div class="card-title-wrapper">
+                        <div class="card-icon"><i class="ph ph-briefcase"></i></div>
+                        <h2 class="card-title">Experience Entry</h2>
+                    </div>
+                    <button class="btn-icon-danger delete-entry-btn" title="Delete Entry">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-row grid-3-col">
+                        <div class="form-group">
+                            <label class="form-label">Role Title</label>
+                            <input type="text" class="form-control" value="AI Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company / Subtitle</label>
+                            <input type="text" class="form-control" value="Freelance & Projects">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <input type="text" class="form-control" value="2025">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control">Developing intelligent AI systems, chatbots, and machine learning solutions. Building next-gen conversational AI agents and JARVIS-like personal assistants.</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience Item 3 -->
+            <div class="card experience-item">
+                <div class="card-header">
+                    <div class="card-title-wrapper">
+                        <div class="card-icon"><i class="ph ph-briefcase"></i></div>
+                        <h2 class="card-title">Experience Entry</h2>
+                    </div>
+                    <button class="btn-icon-danger delete-entry-btn" title="Delete Entry">
+                        <i class="ph ph-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-row grid-3-col">
+                        <div class="form-group">
+                            <label class="form-label">Role Title</label>
+                            <input type="text" class="form-control" value="Full-Stack Developer">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company / Subtitle</label>
+                            <input type="text" class="form-control" value="Freelance & Projects">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Year</label>
+                            <input type="text" class="form-control" value="2024">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control">Built complete web applications from frontend to backend. Developed responsive UIs, RESTful APIs, and database solutions for various clients and projects.</textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript for interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sidebar active state logic
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            const container = document.getElementById('experiences-container');
+
+            // Attach click events to delete buttons
+            const attachDeleteEvents = () => {
+                const deleteBtns = document.querySelectorAll('.delete-entry-btn');
+                deleteBtns.forEach(btn => {
+                    // Remove old listeners to prevent multiple fires
+                    btn.onclick = null; 
+                    
+                    btn.onclick = function() {
+                        if(container.querySelectorAll('.experience-item').length > 1) {
+                            this.closest('.experience-item').remove();
+                        } else {
+                            alert('You must have at least one experience entry.');
+                        }
+                    };
+                });
+            };
+
+            // Initial attachment of delete events
+            attachDeleteEvents();
+
+            // Add new experience card
+            document.getElementById('add-experience-btn').addEventListener('click', () => {
+                // Get the first item to clone its structure
+                const itemToClone = container.querySelector('.experience-item');
+                const newItem = itemToClone.cloneNode(true);
+                
+                // Clear the input fields of the cloned item
+                const inputs = newItem.querySelectorAll('input');
+                inputs.forEach(input => input.value = '');
+                newItem.querySelector('textarea').value = '';
+
+                // Add placeholder text to indicate it's new
+                inputs[0].placeholder = "e.g. Senior Developer";
+                inputs[1].placeholder = "e.g. Tech Corp";
+                inputs[2].placeholder = "e.g. 2023 - Present";
+                newItem.querySelector('textarea').placeholder = "Describe your role...";
+
+                // Prepend the new item to the top of the list
+                container.insertBefore(newItem, container.firstChild);
+                
+                // Re-attach events to include the new delete button
+                attachDeleteEvents();
+                
+                // Smooth scroll to top to see the new entry
+                container.scrollTo({top: 0, behavior: 'smooth'});
+            });
+        });
+    </script>
+
+</body>
+</html>
