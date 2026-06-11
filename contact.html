@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Settings - Portfolio Admin</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* --- Design System Variables --- */
+        :root {
+            --primary-color: #6842EF;
+            --primary-light: #F4F1FE;
+            --primary-hover: #5534cc;
+            --bg-main: #F4F5F7;
+            --bg-sidebar: #FFFFFF;
+            --bg-input: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+            --sidebar-width: 280px;
+        }
+
+        /* --- Base Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Styling --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 24px 0;
+            box-shadow: 1px 0 10px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .brand-blank-space { height: 60px; }
+
+        .nav-menu {
+            padding: 0 16px;
+            flex-grow: 1;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 12px 16px 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9CA3AF;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item i { font-size: 20px; margin-right: 14px; transition: color 0.2s ease; }
+        .nav-item:hover { background-color: #F9FAFB; color: var(--text-main); }
+        .nav-item:hover i { color: var(--text-main); }
+        
+        /* Active State */
+        .nav-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+        .nav-item.active i { color: var(--primary-color); }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: -16px; top: 50%; transform: translateY(-50%);
+            height: 24px; width: 4px; background-color: var(--primary-color); border-radius: 0 4px 4px 0;
+        }
+
+        .user-profile {
+            padding: 24px; border-top: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+        }
+        .user-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .breadcrumbs { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-weight: 500; }
+
+        .btn-primary {
+            background-color: var(--primary-color); color: white; border: none; padding: 10px 24px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(104, 66, 239, 0.2);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        /* --- Forms & Cards --- */
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 900px;
+        }
+
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background-color: #FCFDFF;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .card-title { font-size: 16px; font-weight: 600; }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Form Layouts */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-main); margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border-light);
+            border-radius: 8px; font-size: 14px; color: var(--text-main);
+            background-color: var(--bg-input); outline: none; transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color); background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Input with Icon */
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .input-group .form-control {
+            padding-left: 48px; /* Make room for the icon */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <div class="brand-blank-space"></div>
+            <ul class="nav-menu">
+                <div class="nav-label">Page Management</div>
+                <li class="nav-item">
+                    <i class="ph ph-user"></i> <span class="menu-text">About me</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-wrench"></i> <span class="menu-text">What I do</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-trend-up"></i> <span class="menu-text">My career & experience</span>
+                </li>
+                <li class="nav-item">
+                    <i class="ph ph-folder-notch-open"></i> <span class="menu-text">My work</span>
+                </li>
+                <!-- 5. Contact (Active) -->
+                <li class="nav-item active">
+                    <i class="ph ph-paper-plane-tilt"></i> <span class="menu-text">Contact</span>
+                </li>
+            </ul>
+        </div>
+        <div class="user-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=6842EF&color=fff" alt="Profile">
+            <div class="user-info">
+                <h4>System Admin</h4>
+                <p>admin@portfolio.com</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Right Main Content -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">Contact & Social Links</h1>
+                <div class="breadcrumbs">
+                    <i class="ph ph-house"></i> Home 
+                    <span>/</span> Pages
+                    <span>/</span> <span style="color: var(--text-main);">Contact</span>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="alert('Links saved successfully!')">
+                <i class="ph ph-floppy-disk"></i> Save Changes
+            </button>
+        </header>
+
+        <div class="content-container">
+            
+            <!-- Card 1: Social Media Links -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="ph ph-link"></i></div>
+                    <h2 class="card-title">Social Profiles</h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="grid-2-col">
+                        
+                        <!-- LinkedIn -->
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn URL</label>
+                            <div class="input-group">
+                                <i class="ph ph-linkedin-logo" style="color: #0A66C2;"></i>
+                                <input type="url" class="form-control" placeholder="https://linkedin.com/in/username" value="https://linkedin.com/in/johndoe">
+                            </div>
+                        </div>
+
+                        <!-- GitHub -->
+                        <div class="form-group">
+                            <label class="form-label">GitHub URL</label>
+                            <div class="input-group">
+                                <i class="ph ph-github-logo" style="color: #181717;"></i>
+                                <input type="url" class="form-control" placeholder="https://github.com/username" value="https://github.com/johndoe">
+                            </div>
+                        </div>
+
+                        <!-- Twitter / X -->
+                        <div class="form-group">
+                            <label class="form-label">Twitter / X URL</label>
+                            <div class="input-group">
+                                <i class="ph ph-x-logo" style="color: #000000;"></i>
+                                <input type="url" class="form-control" placeholder="https://twitter.com/username" value="https://twitter.com/johndoe">
+                            </div>
+                        </div>
+
+                        <!-- Instagram -->
+                        <div class="form-group">
+                            <label class="form-label">Instagram URL</label>
+                            <div class="input-group">
+                                <i class="ph ph-instagram-logo" style="color: #E4405F;"></i>
+                                <input type="url" class="form-control" placeholder="https://instagram.com/username" value="https://instagram.com/johndoe">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Direct Contact Details -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="ph ph-envelope-simple"></i></div>
+                    <h2 class="card-title">Direct Contact Information</h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="grid-2-col">
+                        
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label class="form-label">Public Email Address</label>
+                            <div class="input-group">
+                                <i class="ph ph-envelope"></i>
+                                <input type="email" class="form-control" placeholder="hello@yourdomain.com" value="hello@johndoe.com">
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-group">
+                            <label class="form-label">Phone Number (Optional)</label>
+                            <div class="input-group">
+                                <i class="ph ph-phone"></i>
+                                <input type="tel" class="form-control" placeholder="+1 (555) 000-0000">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript for sidebar interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
