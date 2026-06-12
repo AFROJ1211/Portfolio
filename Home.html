@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me - Portfolio Admin</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* --- Design System Variables --- */
+        :root {
+            --primary-color: #6842EF;
+            --primary-light: #F4F1FE;
+            --primary-hover: #5534cc;
+            --bg-main: #F4F5F7;
+            --bg-sidebar: #FFFFFF;
+            --bg-input: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+            --danger-color: #EF4444;
+            --sidebar-width: 280px;
+        }
+
+        /* --- Base Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            /* Hidden by default to prevent unauthenticated access flicker */
+            display: none; 
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Added via JS once Firebase authenticates the user */
+        body.auth-ready {
+            display: flex;
+        }
+
+        /* --- Sidebar Styling --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 24px 0;
+            box-shadow: 1px 0 10px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        /* Top left area deliberately left blank as requested */
+        .brand-blank-space {
+            height: 60px; 
+        }
+
+        /* --- Navigation Menu --- */
+        .nav-menu {
+            padding: 0 16px;
+            flex-grow: 1;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 12px 16px 8px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9CA3AF;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-right: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background-color: #F9FAFB;
+            color: var(--text-main);
+        }
+
+        .nav-item:hover i {
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-item.active i {
+            color: var(--primary-color);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -16px; 
+            top: 50%;
+            transform: translateY(-50%);
+            height: 24px;
+            width: 4px;
+            background-color: var(--primary-color);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* --- User Profile (Bottom) --- */
+        .user-profile {
+            padding: 24px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: default; /* Changed from pointer since we added a specific logout button */
+            transition: background 0.2s;
+        }
+
+        .user-profile:hover {
+            background-color: #F9FAFB;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            overflow: hidden;
+        }
+
+        .user-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #logoutBtn {
+            margin-left: auto;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        #logoutBtn:hover {
+            color: var(--danger-color);
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .breadcrumbs {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* --- Layout & Cards --- */
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 1000px; /* Keeps forms readable on wide screens */
+        }
+
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background-color: #FCFDFF;
+        }
+
+        .card-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* --- Form Elements --- */
+        .grid-3-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: var(--bg-input);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 180px; /* Taller area for paragraph */
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <!-- Blank space where logo used to be -->
+            <div class="brand-blank-space"></div>
+
+            <!-- Navigation Links -->
+            <ul class="nav-menu">
+                <div class="nav-label">Page Management</div>
+                
+                <li class="nav-item active">
+                    <i class="ph ph-user"></i>
+                    <span class="menu-text">About me</span>
+                </li>
+
+                <li class="nav-item">
+                    <i class="ph ph-wrench"></i>
+                    <span class="menu-text">What I do</span>
+                </li>
+
+                <li class="nav-item">
+                    <i class="ph ph-trend-up"></i>
+                    <span class="menu-text">My career & experience</span>
+                </li>
+
+                <li class="nav-item">
+                    <i class="ph ph-folder-notch-open"></i>
+                    <span class="menu-text">My work</span>
+                </li>
+
+                <li class="nav-item">
+                    <i class="ph ph-paper-plane-tilt"></i>
+                    <span class="menu-text">Contact</span>
+                </li>
+
+                <!-- Added Tech Stack Category -->
+                <li class="nav-item">
+                    <i class="ph ph-stack"></i>
+                    <span class="menu-text">Tech Stack</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- User Profile (Dynamic) -->
+        <div class="user-profile">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=Loading&background=F4F5F7&color=6B7280" alt="Profile">
+            <div class="user-info">
+                <h4 id="userName">Authenticating...</h4>
+                <p id="userEmail">Please wait...</p>
+            </div>
+            <!-- Logout Button -->
+            <i class="ph ph-sign-out" id="logoutBtn" title="Logout safely"></i>
+        </div>
+    </aside>
+
+    <!-- Right Main Content -->
+    <main class="main-content">
+        
+        <!-- Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">About Me Content</h1>
+                <div class="breadcrumbs">
+                    <i class="ph ph-house"></i> Home 
+                    <span>/</span> Pages
+                    <span>/</span> <span style="color: var(--text-main);">About Me</span>
+                </div>
+            </div>
+            <button class="btn-primary">
+                <i class="ph ph-floppy-disk"></i> Save Changes
+            </button>
+        </header>
+
+        <!-- About Me Content Container -->
+        <div class="content-container">
+            
+            <!-- Card 1: Role Configuration (3 Columns) -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-wrapper">
+                        <div class="card-icon"><i class="ph ph-text-t"></i></div>
+                        <h2 class="card-title">Hero Banner Text (Role)</h2>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="grid-3-col">
+                        <div class="form-group">
+                            <label class="form-label">Line 1 (Top Text)</label>
+                            <input type="text" class="form-control" value="Java">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Line 2 (Middle Text)</label>
+                            <input type="text" class="form-control" value="FULL STACK">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Line 3 (Bottom Text)</label>
+                            <input type="text" class="form-control" value="DEVELOPER">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: About Me Paragraph -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-wrapper">
+                        <div class="card-icon"><i class="ph ph-paragraph"></i></div>
+                        <h2 class="card-title">About Me Paragraph</h2>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Main Description Text</label>
+                        <textarea class="form-control">Seeking a responsible career opportunity in an organization where I can utilize my skills in the best possible manner, which further gives me an opportunity to grow in my career journey while contributing to the development of the organization.</textarea>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Firebase Integration & Protection Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhA-AAzP3kf7Zn0c98k0ozlkqk1aST-x0",
+            authDomain: "planning-with-ai-592ee.firebaseapp.com",
+            projectId: "planning-with-ai-592ee",
+            storageBucket: "planning-with-ai-592ee.firebasestorage.app",
+            messagingSenderId: "321067926334",
+            appId: "1:321067926334:web:e9cb315d9eae763e0e626f"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Elements
+        const userNameEl = document.getElementById('userName');
+        const userEmailEl = document.getElementById('userEmail');
+        const userAvatarEl = document.getElementById('userAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Check Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in! Reveal the page content.
+                document.body.classList.add('auth-ready');
+
+                // Update email
+                userEmailEl.textContent = user.email;
+
+                // Determine display name (Fallback to prefix of email if null)
+                let displayName = user.displayName;
+                if (!displayName) {
+                    displayName = user.email.split('@')[0];
+                    // Capitalize first letter
+                    displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+                }
+                userNameEl.textContent = displayName;
+
+                // Set Avatar (Use Google Photo URL if exists, else generate one with initials)
+                if (user.photoURL) {
+                    userAvatarEl.src = user.photoURL;
+                } else {
+                    userAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6842EF&color=fff&bold=true`;
+                }
+
+            } else {
+                // User is NOT signed in. Redirect immediately to the login page.
+                // Replace 'login.html' with the actual path to your login page file
+                window.location.replace('login.html'); 
+            }
+        });
+
+        // Handle Logout
+        logoutBtn.addEventListener('click', () => {
+            if(confirm("Are you sure you want to log out?")) {
+                signOut(auth).then(() => {
+                    // Sign-out successful, will trigger onAuthStateChanged and redirect
+                }).catch((error) => {
+                    console.error("Error signing out: ", error);
+                    alert("Failed to log out. Please try again.");
+                });
+            }
+        });
+
+        // Navigation visual toggle (UI only)
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
