@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me - Portfolio Admin</title>
+    <title>Admin Login - AFROJ</title>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
@@ -16,12 +16,13 @@
             --primary-light: #F4F1FE;
             --primary-hover: #5534cc;
             --bg-main: #F4F5F7;
-            --bg-sidebar: #FFFFFF;
+            --bg-card: #FFFFFF;
             --bg-input: #F9FAFB;
             --text-main: #111827;
             --text-muted: #6B7280;
             --border-light: #E5E7EB;
-            --sidebar-width: 280px;
+            --danger-color: #EF4444;
+            --danger-bg: #FEF2F2;
         }
 
         /* --- Base Reset --- */
@@ -36,251 +37,92 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             display: flex;
-            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
             overflow: hidden;
         }
 
-        /* --- Sidebar Styling --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--bg-sidebar);
-            border-right: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            padding: 24px 0;
-            box-shadow: 1px 0 10px rgba(0,0,0,0.02);
-            z-index: 10;
-        }
-
-        /* Top left area deliberately left blank as requested */
-        .brand-blank-space {
-            height: 60px; 
-        }
-
-        /* --- Navigation Menu --- */
-        .nav-menu {
-            padding: 0 16px;
-            flex-grow: 1;
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .nav-label {
-            padding: 12px 16px 8px 16px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #9CA3AF;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            margin-right: 14px;
-            transition: color 0.2s ease;
-        }
-
-        .nav-item:hover {
-            background-color: #F9FAFB;
-            color: var(--text-main);
-        }
-
-        .nav-item:hover i {
-            color: var(--text-main);
-        }
-
-        .nav-item.active {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .nav-item.active i {
-            color: var(--primary-color);
-        }
-
-        .nav-item.active::before {
-            content: '';
+        /* --- Ambient Background Glows (Premium Feel) --- */
+        .bg-glow {
             position: absolute;
-            left: -16px; 
-            top: 50%;
-            transform: translateY(-50%);
-            height: 24px;
-            width: 4px;
-            background-color: var(--primary-color);
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* --- User Profile (Bottom) --- */
-        .user-profile {
-            padding: 24px;
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .user-profile:hover {
-            background-color: #F9FAFB;
-        }
-
-        .user-profile img {
-            width: 40px;
-            height: 40px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.6;
+        }
+        
+        .glow-1 {
+            background: rgba(104, 66, 239, 0.3);
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
         }
 
-        .user-info h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-main);
+        .glow-2 {
+            background: rgba(59, 130, 246, 0.2);
+            width: 500px;
+            height: 500px;
+            bottom: -150px;
+            right: -150px;
         }
 
-        .user-info p {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
+        /* --- Login Card Container --- */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
         }
 
-        /* --- Main Content Area --- */
-        .main-content {
-            flex-grow: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+        .login-card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            padding: 48px 40px;
+            backdrop-filter: blur(10px);
         }
 
-        .page-header {
-            margin-bottom: 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+        /* --- Branding Header --- */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 36px;
         }
 
-        .page-title {
+        .brand-header h1 {
             font-size: 26px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 10px;
             letter-spacing: -0.5px;
+            margin-bottom: 8px;
         }
 
-        .breadcrumbs {
-            font-size: 13px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .brand-header p {
             font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            color: var(--text-muted);
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* --- Layout & Cards --- */
-        .content-container {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 1000px; /* Keeps forms readable on wide screens */
-        }
-
-        .card {
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-light);
-            overflow: hidden;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-light);
-            background-color: #FCFDFF;
-        }
-
-        .card-title-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .card-icon {
-            width: 32px;
-            height: 32px;
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 18px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .card-body {
-            padding: 24px;
+        /* --- Error Message Box --- */
+        .error-message {
+            display: none;
+            background-color: var(--danger-bg);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 24px;
         }
 
         /* --- Form Elements --- */
-        .grid-3-col {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
         .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
+            margin-bottom: 24px;
         }
 
         .form-label {
@@ -291,11 +133,27 @@
             margin-bottom: 8px;
         }
 
+        /* Input with Icons */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.left-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 20px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
         .form-control {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px 14px 48px;
             border: 1px solid var(--border-light);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             color: var(--text-main);
             background-color: var(--bg-input);
@@ -303,155 +161,286 @@
             transition: all 0.2s;
         }
 
+        .form-control::placeholder {
+            color: #9CA3AF;
+        }
+
         .form-control:focus {
             border-color: var(--primary-color);
             background-color: #FFFFFF;
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        .form-control:focus + i.left-icon,
+        .input-wrapper:focus-within i.left-icon {
+            color: var(--primary-color);
         }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 180px; /* Taller area for paragraph */
-            line-height: 1.5;
+        /* Password Reveal Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            color: var(--text-muted);
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .password-toggle:hover {
+            color: var(--text-main);
         }
 
+        /* --- Options Row --- */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .forgot-password:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        /* --- Submit Button --- */
+        .btn-submit {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(104, 66, 239, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(104, 66, 239, 0.3);
+        }
+
+        .btn-submit:disabled {
+            background-color: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- Return Link --- */
+        .return-link {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 32px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .return-link:hover {
+            color: var(--text-main);
+        }
+        
     </style>
 </head>
 <body>
 
-    <!-- Left Sidebar -->
-    <aside class="sidebar">
-        <div>
-            <!-- Blank space where logo used to be -->
-            <div class="brand-blank-space"></div>
+    <!-- Ambient Background Lights -->
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
 
-            <!-- Navigation Links -->
-            <ul class="nav-menu">
-                <div class="nav-label">Page Management</div>
-                
-                <!-- 1. About me (Active) -->
-                <li class="nav-item active">
-                    <i class="ph ph-user"></i>
-                    <span class="menu-text">About me</span>
-                </li>
-
-                <!-- 2. What I do -->
-                <li class="nav-item">
-                    <i class="ph ph-wrench"></i>
-                    <span class="menu-text">What I do</span>
-                </li>
-
-                <!-- 3. My career and experience -->
-                <li class="nav-item">
-                    <i class="ph ph-trend-up"></i>
-                    <span class="menu-text">My career & experience</span>
-                </li>
-
-                <!-- 4. My work -->
-                <li class="nav-item">
-                    <i class="ph ph-folder-notch-open"></i>
-                    <span class="menu-text">My work</span>
-                </li>
-
-                <!-- 5. Contact -->
-                <li class="nav-item">
-                    <i class="ph ph-paper-plane-tilt"></i>
-                    <span class="menu-text">Contact</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- User Profile -->
-        <div class="user-profile">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=6842EF&color=fff" alt="Profile">
-            <div class="user-info">
-                <h4>System Admin</h4>
-                <p>admin@portfolio.com</p>
+    <div class="login-wrapper">
+        <div class="login-card">
+            
+            <div class="brand-header">
+                <h1>Welcome back AFROJ</h1>
+                <p>Enter your credentials to access the admin panel.</p>
             </div>
-        </div>
-    </aside>
 
-    <!-- Right Main Content -->
-    <main class="main-content">
+            <!-- Error message container -->
+            <div id="errorMessage" class="error-message"></div>
+
+            <form id="loginForm">
+                
+                <!-- Email Input -->
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="emailInput" class="form-control" placeholder="admin@portfolio.com" required>
+                        <i class="ph ph-envelope-simple left-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="passwordInput" class="form-control" placeholder="••••••••" required>
+                        <i class="ph ph-lock left-icon"></i>
+                        <button type="button" class="password-toggle" id="toggleBtn" aria-label="Toggle password visibility">
+                            <i class="ph ph-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" checked>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    Sign In <i class="ph ph-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+
+        <!-- Back to portfolio -->
+        <a href="#" class="return-link">
+            <i class="ph ph-arrow-left"></i> Return to main website
+        </a>
+    </div>
+
+    <!-- Firebase Integration (Using ES Modules via CDN for standalone HTML) -->
+    <script type="module">
+        // 1. Import Firebase Core and Auth
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        // 2. Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhA-AAzP3kf7Zn0c98k0ozlkqk1aST-x0",
+            authDomain: "planning-with-ai-592ee.firebaseapp.com",
+            projectId: "planning-with-ai-592ee",
+            storageBucket: "planning-with-ai-592ee.firebasestorage.app",
+            messagingSenderId: "321067926334",
+            appId: "1:321067926334:web:e9cb315d9eae763e0e626f"
+        };
+
+        // 3. Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
         
-        <!-- Header -->
-        <header class="page-header">
-            <div>
-                <h1 class="page-title">About Me Content</h1>
-                <div class="breadcrumbs">
-                    <i class="ph ph-house"></i> Home 
-                    <span>/</span> Pages
-                    <span>/</span> <span style="color: var(--text-main);">About Me</span>
-                </div>
-            </div>
-            <button class="btn-primary">
-                <i class="ph ph-floppy-disk"></i> Save Changes
-            </button>
-        </header>
+        // --- Password Visibility Toggle Logic ---
+        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
 
-        <!-- About Me Content Container -->
-        <div class="content-container">
+        toggleBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('ph-eye');
+                toggleIcon.classList.add('ph-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('ph-eye-slash');
+                toggleIcon.classList.add('ph-eye');
+            }
+        });
+
+        // --- Handle Form Submission (Firebase Login) ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            <!-- Card 1: Role Configuration (3 Columns) -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title-wrapper">
-                        <div class="card-icon"><i class="ph ph-text-t"></i></div>
-                        <h2 class="card-title">Hero Banner Text (Role)</h2>
-                    </div>
-                </div>
+            // Hide previous errors
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            // Get credentials
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            // Change button state to simulate loading
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Authenticating...';
+            submitBtn.disabled = true;
+
+            try {
+                // Attempt Firebase Sign In
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
                 
-                <div class="card-body">
-                    <div class="grid-3-col">
-                        <div class="form-group">
-                            <label class="form-label">Line 1 (Top Text)</label>
-                            <input type="text" class="form-control" value="Java">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Line 2 (Middle Text)</label>
-                            <input type="text" class="form-control" value="FULL STACK">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Line 3 (Bottom Text)</label>
-                            <input type="text" class="form-control" value="DEVELOPER">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 2: About Me Paragraph -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title-wrapper">
-                        <div class="card-icon"><i class="ph ph-paragraph"></i></div>
-                        <h2 class="card-title">About Me Paragraph</h2>
-                    </div>
-                </div>
+                // Login Successful! Redirect to Admin Panel
+                submitBtn.innerHTML = '<i class="ph ph-check-circle"></i> Success!';
+                submitBtn.style.backgroundColor = "#10B981"; // Success Green
                 
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">Main Description Text</label>
-                        <textarea class="form-control">Seeking a responsible career opportunity in an organization where I can utilize my skills in the best possible manner, which further gives me an opportunity to grow in my career journey while contributing to the development of the organization.</textarea>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </main>
+                setTimeout(() => {
+                    window.location.href = "https://admin.rojz.in";
+                }, 500);
 
-    <!-- Simple JS to handle menu active states visually -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const navItems = document.querySelectorAll('.nav-item');
+            } catch (error) {
+                // Handle Errors
+                console.error("Login failed:", error.code, error.message);
+                
+                // Format friendly error messages based on Firebase codes
+                let friendlyMessage = "An error occurred during login. Please try again.";
+                
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    friendlyMessage = "Invalid email or password. Please try again.";
+                } else if (error.code === 'auth/too-many-requests') {
+                    friendlyMessage = "Too many failed login attempts. Please try again later.";
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "Please enter a valid email address.";
+                }
 
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
+                // Display Error
+                errorMessage.textContent = friendlyMessage;
+                errorMessage.style.display = 'block';
+
+                // Reset Button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
     </script>
-
 </body>
 </html>
