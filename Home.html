@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me - Portfolio Admin</title>
+    <title>Dashboard - Portfolio Admin</title>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
@@ -33,10 +33,10 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Hidden by default to prevent unauthenticated access flicker */
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            /* Hidden by default to prevent unauthenticated access flicker */
             display: none; 
             height: 100vh;
             overflow: hidden;
@@ -61,10 +61,7 @@
             z-index: 10;
         }
 
-        /* Top left area deliberately left blank as requested */
-        .brand-blank-space {
-            height: 60px; 
-        }
+        .brand-blank-space { height: 60px; }
 
         /* --- Navigation Menu --- */
         .nav-menu {
@@ -98,56 +95,25 @@
             position: relative;
         }
 
-        .nav-item i {
-            font-size: 20px;
-            margin-right: 14px;
-            transition: color 0.2s ease;
-        }
+        .nav-item i { font-size: 20px; margin-right: 14px; transition: color 0.2s ease; }
+        .nav-item:hover { background-color: #F9FAFB; color: var(--text-main); }
+        .nav-item:hover i { color: var(--text-main); }
 
-        .nav-item:hover {
-            background-color: #F9FAFB;
-            color: var(--text-main);
-        }
-
-        .nav-item:hover i {
-            color: var(--text-main);
-        }
-
-        .nav-item.active {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .nav-item.active i {
-            color: var(--primary-color);
-        }
-
+        .nav-item.active { background-color: var(--primary-light); color: var(--primary-color); font-weight: 600; }
+        .nav-item.active i { color: var(--primary-color); }
         .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: -16px; 
-            top: 50%;
-            transform: translateY(-50%);
-            height: 24px;
-            width: 4px;
-            background-color: var(--primary-color);
-            border-radius: 0 4px 4px 0;
+            content: ''; position: absolute; left: -16px; top: 50%; transform: translateY(-50%);
+            height: 24px; width: 4px; background-color: var(--primary-color); border-radius: 0 4px 4px 0;
         }
 
-        /* --- User Profile (Bottom) --- */
+        /* --- User Profile (Bottom Left) --- */
         .user-profile {
             padding: 24px;
             border-top: 1px solid var(--border-light);
             display: flex;
             align-items: center;
             gap: 12px;
-            cursor: default; /* Changed from pointer since we added a specific logout button */
-            transition: background 0.2s;
-        }
-
-        .user-profile:hover {
-            background-color: #F9FAFB;
+            background-color: var(--bg-sidebar);
         }
 
         .user-profile img {
@@ -161,6 +127,7 @@
 
         .user-info {
             overflow: hidden;
+            flex-grow: 1;
         }
 
         .user-info h4 {
@@ -182,15 +149,16 @@
         }
 
         #logoutBtn {
-            margin-left: auto;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 22px;
             color: var(--text-muted);
             transition: color 0.2s;
+            padding: 4px;
+            border-radius: 6px;
         }
-
         #logoutBtn:hover {
             color: var(--danger-color);
+            background-color: var(--danger-bg);
         }
 
         /* --- Main Content Area --- */
@@ -217,40 +185,22 @@
             letter-spacing: -0.5px;
         }
 
-        .breadcrumbs {
-            font-size: 13px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
+        .breadcrumbs { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-weight: 500; }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+            background-color: var(--primary-color); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
             transition: background-color 0.2s;
         }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:disabled { background-color: #9CA3AF; cursor: not-allowed; }
 
         /* --- Layout & Cards --- */
         .content-container {
             display: flex;
             flex-direction: column;
             gap: 24px;
-            max-width: 1000px; /* Keeps forms readable on wide screens */
+            max-width: 1000px;
         }
 
         .card {
@@ -340,9 +290,23 @@
 
         textarea.form-control {
             resize: vertical;
-            min-height: 180px; /* Taller area for paragraph */
+            min-height: 180px; 
             line-height: 1.5;
         }
+
+        /* Overlay for loading state */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        .card-body { position: relative; }
 
     </style>
 </head>
@@ -383,7 +347,6 @@
                     <span class="menu-text">Contact</span>
                 </li>
 
-                <!-- Added Tech Stack Category -->
                 <li class="nav-item">
                     <i class="ph ph-stack"></i>
                     <span class="menu-text">Tech Stack</span>
@@ -416,7 +379,7 @@
                     <span>/</span> <span style="color: var(--text-main);">About Me</span>
                 </div>
             </div>
-            <button class="btn-primary">
+            <button id="saveAboutBtn" class="btn-primary">
                 <i class="ph ph-floppy-disk"></i> Save Changes
             </button>
         </header>
@@ -434,18 +397,19 @@
                 </div>
                 
                 <div class="card-body">
+                    <div class="loading-overlay" id="loadingOverlay1"><i class="ph ph-spinner ph-spin"></i></div>
                     <div class="grid-3-col">
                         <div class="form-group">
                             <label class="form-label">Line 1 (Top Text)</label>
-                            <input type="text" class="form-control" value="Java">
+                            <input type="text" id="heroLine1" class="form-control" placeholder="e.g. Java">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Line 2 (Middle Text)</label>
-                            <input type="text" class="form-control" value="FULL STACK">
+                            <input type="text" id="heroLine2" class="form-control" placeholder="e.g. FULL STACK">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Line 3 (Bottom Text)</label>
-                            <input type="text" class="form-control" value="DEVELOPER">
+                            <input type="text" id="heroLine3" class="form-control" placeholder="e.g. DEVELOPER">
                         </div>
                     </div>
                 </div>
@@ -461,9 +425,10 @@
                 </div>
                 
                 <div class="card-body">
+                    <div class="loading-overlay" id="loadingOverlay2"><i class="ph ph-spinner ph-spin"></i></div>
                     <div class="form-group">
                         <label class="form-label">Main Description Text</label>
-                        <textarea class="form-control">Seeking a responsible career opportunity in an organization where I can utilize my skills in the best possible manner, which further gives me an opportunity to grow in my career journey while contributing to the development of the organization.</textarea>
+                        <textarea id="aboutDescription" class="form-control" placeholder="Write about yourself here..."></textarea>
                     </div>
                 </div>
             </div>
@@ -475,6 +440,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        // Import Firestore
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // Your Firebase Configuration
         const firebaseConfig = {
@@ -486,44 +453,53 @@
             appId: "1:321067926334:web:e9cb315d9eae763e0e626f"
         };
 
-        // Initialize Firebase
+        // Initialize Firebase & Firestore
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Elements
+        // --- Auth & User Interface Elements ---
         const userNameEl = document.getElementById('userName');
         const userEmailEl = document.getElementById('userEmail');
         const userAvatarEl = document.getElementById('userAvatar');
         const logoutBtn = document.getElementById('logoutBtn');
+        
+        // --- Database Form Elements ---
+        const saveAboutBtn = document.getElementById('saveAboutBtn');
+        const heroLine1 = document.getElementById('heroLine1');
+        const heroLine2 = document.getElementById('heroLine2');
+        const heroLine3 = document.getElementById('heroLine3');
+        const aboutDescription = document.getElementById('aboutDescription');
+        
+        const overlay1 = document.getElementById('loadingOverlay1');
+        const overlay2 = document.getElementById('loadingOverlay2');
 
         // Check Authentication State
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in! Reveal the page content.
+                // Show page
                 document.body.classList.add('auth-ready');
 
-                // Update email
+                // Update email & profile picture
                 userEmailEl.textContent = user.email;
-
-                // Determine display name (Fallback to prefix of email if null)
                 let displayName = user.displayName;
                 if (!displayName) {
                     displayName = user.email.split('@')[0];
-                    // Capitalize first letter
                     displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
                 }
                 userNameEl.textContent = displayName;
 
-                // Set Avatar (Use Google Photo URL if exists, else generate one with initials)
                 if (user.photoURL) {
                     userAvatarEl.src = user.photoURL;
                 } else {
                     userAvatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6842EF&color=fff&bold=true`;
                 }
 
+                // FETCH EXISTING DATA FROM FIRESTORE
+                fetchAboutData();
+
             } else {
-                // User is NOT signed in. Redirect immediately to the login page.
-                // Replace 'login.html' with the actual path to your login page file
+                // Redirect if not logged in
                 window.location.replace('login.html'); 
             }
         });
@@ -531,12 +507,84 @@
         // Handle Logout
         logoutBtn.addEventListener('click', () => {
             if(confirm("Are you sure you want to log out?")) {
-                signOut(auth).then(() => {
-                    // Sign-out successful, will trigger onAuthStateChanged and redirect
-                }).catch((error) => {
+                signOut(auth).catch((error) => {
                     console.error("Error signing out: ", error);
                     alert("Failed to log out. Please try again.");
                 });
+            }
+        });
+
+        // ==========================================
+        // FIRESTORE: FETCH DATA
+        // ==========================================
+        async function fetchAboutData() {
+            // Show loading overlays inside inputs
+            overlay1.style.display = 'flex';
+            overlay2.style.display = 'flex';
+
+            try {
+                // Fetch document 'aboutMe' from collection 'portfolio'
+                const docRef = doc(db, "portfolio", "aboutMe");
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Populate inputs if data exists
+                    if(data.heroLine1) heroLine1.value = data.heroLine1;
+                    if(data.heroLine2) heroLine2.value = data.heroLine2;
+                    if(data.heroLine3) heroLine3.value = data.heroLine3;
+                    if(data.description) aboutDescription.value = data.description;
+                } else {
+                    console.log("No existing data found. Start typing to save new data.");
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                // Non-intrusive alert for errors
+                console.warn("Could not load previous data. You might have insufficient permissions.");
+            } finally {
+                // Hide loading overlays
+                overlay1.style.display = 'none';
+                overlay2.style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // FIRESTORE: SAVE DATA
+        // ==========================================
+        saveAboutBtn.addEventListener('click', async () => {
+            // Change button state
+            const originalText = saveAboutBtn.innerHTML;
+            saveAboutBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+            saveAboutBtn.disabled = true;
+
+            try {
+                // Save to document 'aboutMe' in collection 'portfolio'
+                await setDoc(doc(db, "portfolio", "aboutMe"), {
+                    heroLine1: heroLine1.value,
+                    heroLine2: heroLine2.value,
+                    heroLine3: heroLine3.value,
+                    description: aboutDescription.value,
+                    lastUpdated: new Date() // useful for tracking
+                });
+
+                // Show success status
+                saveAboutBtn.innerHTML = '<i class="ph ph-check"></i> Saved!';
+                saveAboutBtn.style.backgroundColor = '#10B981'; // green
+
+                // Revert button after 2 seconds
+                setTimeout(() => {
+                    saveAboutBtn.innerHTML = originalText;
+                    saveAboutBtn.style.backgroundColor = '';
+                    saveAboutBtn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error saving data:", error);
+                alert("Failed to save changes. Make sure your Firestore Security Rules allow writes.");
+                
+                // Revert button immediately on error
+                saveAboutBtn.innerHTML = originalText;
+                saveAboutBtn.disabled = false;
             }
         });
 
@@ -549,6 +597,5 @@
             });
         });
     </script>
-
 </body>
 </html>
