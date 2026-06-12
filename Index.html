@@ -83,7 +83,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.05);
             border: 1px solid var(--border-light);
-            padding: 48px 40px;
+            padding: 48px 40px 56px 40px;
             backdrop-filter: blur(10px);
         }
 
@@ -99,11 +99,6 @@
             color: var(--text-main);
             letter-spacing: -0.5px;
             margin-bottom: 8px;
-        }
-
-        .brand-header p {
-            font-size: 14px;
-            color: var(--text-muted);
         }
 
         /* --- Error Message Box --- */
@@ -261,24 +256,6 @@
             transform: none;
             box-shadow: none;
         }
-
-        /* --- Return Link --- */
-        .return-link {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            margin-top: 32px;
-            font-size: 13px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .return-link:hover {
-            color: var(--text-main);
-        }
-        
     </style>
 </head>
 <body>
@@ -292,13 +269,13 @@
             
             <div class="brand-header">
                 <h1>Welcome back AFROJ</h1>
-                <p>Enter your credentials to access the admin panel.</p>
             </div>
 
             <!-- Error message container -->
             <div id="errorMessage" class="error-message"></div>
 
-            <form id="loginForm">
+            <!-- Added onsubmit="return false;" to prevent the browser from refreshing the page -->
+            <form id="loginForm" onsubmit="return false;">
                 
                 <!-- Email Input -->
                 <div class="form-group">
@@ -337,18 +314,13 @@
             </form>
 
         </div>
-
-        <!-- Back to portfolio -->
-        <a href="#" class="return-link">
-            <i class="ph ph-arrow-left"></i> Return to main website
-        </a>
     </div>
 
-    <!-- Firebase Integration (Using ES Modules via CDN for standalone HTML) -->
+    <!-- Firebase Integration -->
     <script type="module">
         // 1. Import Firebase Core and Auth
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // 2. Your Firebase Configuration
         const firebaseConfig = {
@@ -363,6 +335,14 @@
         // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        // --- Bulletproof Redirect: Instantly fires if user is recognized ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Instantly redirects to the Home page
+                window.location.replace("https://admin.rojz.in/Home.html");
+            }
+        });
 
         // --- DOM Elements ---
         const loginForm = document.getElementById('loginForm');
@@ -389,7 +369,7 @@
 
         // --- Handle Form Submission (Firebase Login) ---
         loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Stop page reload explicitly
             
             // Hide previous errors
             errorMessage.style.display = 'none';
@@ -406,19 +386,15 @@
 
             try {
                 // Attempt Firebase Sign In
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+                await signInWithEmailAndPassword(auth, email, password);
                 
-                // Login Successful! Redirect to Admin Panel
+                // If successful, onAuthStateChanged (above) will catch it and redirect.
+                // We update the UI to show success just in case there is a tiny delay.
                 submitBtn.innerHTML = '<i class="ph ph-check-circle"></i> Success!';
                 submitBtn.style.backgroundColor = "#10B981"; // Success Green
-                
-                setTimeout(() => {
-                    window.location.href = "https://admin.rojz.in";
-                }, 500);
 
             } catch (error) {
-                // Handle Errors
+                // Log to console for debugging
                 console.error("Login failed:", error.code, error.message);
                 
                 // Format friendly error messages based on Firebase codes
