@@ -20,6 +20,8 @@
             --text-main: #111827;
             --text-muted: #6B7280;
             --border-light: #E5E7EB;
+            --danger-color: #EF4444;
+            --danger-bg: #FEF2F2;
             --sidebar-width: 280px;
             
             /* Dark Theme specific for these cards */
@@ -40,9 +42,13 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            display: flex;
+            display: none; /* Hidden until Firebase authenticates */
             height: 100vh;
             overflow: hidden;
+        }
+
+        body.auth-ready {
+            display: flex;
         }
 
         /* --- Sidebar Styling --- */
@@ -112,13 +118,61 @@
             height: 24px; width: 4px; background-color: var(--primary-color); border-radius: 0 4px 4px 0;
         }
 
+        /* --- User Profile (Bottom Left) --- */
         .user-profile {
-            padding: 24px; border-top: 1px solid var(--border-light);
-            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 24px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--bg-sidebar);
         }
-        .user-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .user-info h4 { font-size: 14px; font-weight: 600; }
-        .user-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .user-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #logoutBtn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        #logoutBtn:hover {
+            color: var(--danger-color);
+            background-color: var(--danger-bg);
+        }
 
         /* --- Main Content Area --- */
         .main-content {
@@ -151,8 +205,10 @@
         .btn-primary {
             background-color: var(--primary-color); color: white; border: none; padding: 10px 20px;
             border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
+            transition: background-color 0.2s;
         }
         .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:disabled { background-color: #9CA3AF; cursor: not-allowed; }
 
         .btn-outline {
             background-color: white; color: var(--text-main); border: 1px solid var(--border-light); padding: 10px 20px;
@@ -166,6 +222,14 @@
             flex-direction: column;
             gap: 32px;
             max-width: 800px;
+            position: relative;
+        }
+
+        .loading-data {
+            position: absolute;
+            top: 50px; left: 50%; transform: translateX(-50%);
+            color: var(--primary-color); font-size: 32px;
+            display: none;
         }
 
         .role-card {
@@ -177,7 +241,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        /* Corner Dashed Accents (mimicking the image perfectly) */
         .corner {
             position: absolute;
             width: 16px; height: 16px;
@@ -190,24 +253,17 @@
         .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
         .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 
-        /* Delete Button */
         .delete-card-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--card-text-muted);
+            top: 20px; right: 20px;
+            background: rgba(255, 255, 255, 0.05); color: var(--card-text-muted);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 32px; height: 32px;
-            border-radius: 6px;
+            width: 32px; height: 32px; border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
-            font-size: 16px;
-            z-index: 2;
+            cursor: pointer; transition: all 0.2s; font-size: 16px; z-index: 2;
         }
         .delete-card-btn:hover { background: rgba(239, 68, 68, 0.15); color: #EF4444; border-color: rgba(239, 68, 68, 0.3); }
 
-        /* Form Inputs Inside Dark Card */
         .dark-input-group { margin-bottom: 24px; position: relative; }
         .dark-input-group:last-child { margin-bottom: 0; }
 
@@ -223,25 +279,15 @@
         }
         .dark-input:hover, .dark-input:focus { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.2); }
 
-        /* Specific typography matching the image */
         .input-title { font-size: 28px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 12px 14px;}
-        .input-highlight { font-size: 15px; color: #A190B5; /* Subdued purple matching image */ font-weight: 500; }
+        .input-highlight { font-size: 15px; color: #A190B5; font-weight: 500; }
         .input-desc { font-size: 14px; color: var(--card-text-muted); line-height: 1.6; resize: vertical; min-height: 100px; }
 
-        /* Skills Tags System */
         .skills-wrapper { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         
         .skill-pill {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #E5E7EB;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: border-color 0.2s;
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: #E5E7EB;
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: border-color 0.2s;
         }
         .skill-pill:hover { border-color: rgba(255, 255, 255, 0.6); }
         .skill-pill i { font-size: 10px; cursor: pointer; color: rgba(255,255,255,0.5); transition: color 0.2s; }
@@ -264,30 +310,45 @@
             <div class="brand-blank-space"></div>
             <ul class="nav-menu">
                 <div class="nav-label">Page Management</div>
-                <li class="nav-item">
+                
+                <!-- URL Redirects applied here -->
+                <li class="nav-item" onclick="window.location.href='https://admin.rojz.in/home.html'">
                     <i class="ph ph-user"></i> <span class="menu-text">About me</span>
                 </li>
-                <!-- 2. What I do (Active) -->
+                
+                <!-- Active Page -->
                 <li class="nav-item active">
                     <i class="ph ph-wrench"></i> <span class="menu-text">What I do</span>
                 </li>
-                <li class="nav-item">
+                
+                <li class="nav-item" onclick="window.location.href='https://admin.rojz.in/career.html'">
                     <i class="ph ph-trend-up"></i> <span class="menu-text">My career & experience</span>
                 </li>
-                <li class="nav-item">
+                
+                <li class="nav-item" onclick="window.location.href='https://admin.rojz.in/work.html'">
                     <i class="ph ph-folder-notch-open"></i> <span class="menu-text">My work</span>
                 </li>
-                <li class="nav-item">
+                
+                <li class="nav-item" onclick="window.location.href='https://admin.rojz.in/contact.html'">
                     <i class="ph ph-paper-plane-tilt"></i> <span class="menu-text">Contact</span>
+                </li>
+
+                <!-- Added Tech Stack Category -->
+                <li class="nav-item" onclick="window.location.href='https://admin.rojz.in/Tech.html'">
+                    <i class="ph ph-stack"></i> <span class="menu-text">Tech Stack</span>
                 </li>
             </ul>
         </div>
+        
+        <!-- User Profile (Dynamic) -->
         <div class="user-profile">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=6842EF&color=fff" alt="Profile">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=Loading&background=F4F5F7&color=6B7280" alt="Profile">
             <div class="user-info">
-                <h4>System Admin</h4>
-                <p>admin@portfolio.com</p>
+                <h4 id="userName">Authenticating...</h4>
+                <p id="userEmail">Please wait...</p>
             </div>
+            <!-- Logout Button -->
+            <i class="ph ph-sign-out" id="logoutBtn" title="Logout safely"></i>
         </div>
     </aside>
 
@@ -305,156 +366,228 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-outline">
+                <button class="btn-outline" id="addRoleBtn">
                     <i class="ph ph-plus"></i> Add New Role
                 </button>
-                <button class="btn-primary">
+                <button class="btn-primary" id="saveDataBtn">
                     <i class="ph ph-floppy-disk"></i> Save Changes
                 </button>
             </div>
         </header>
 
-        <!-- Dynamic Dark Editor Cards based on your UI image -->
-        <div class="cards-container">
-            
-            <!-- Role Card 1 -->
-            <div class="role-card">
-                <!-- Corner dashed styling -->
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
-                
-                <!-- Delete Card Action -->
-                <button class="delete-card-btn" title="Delete Role">
-                    <i class="ph ph-trash"></i>
-                </button>
-
-                <!-- Editor Fields -->
-                <div class="dark-input-group">
-                    <label class="dark-label">Job Title</label>
-                    <input type="text" class="dark-input input-title" value="AI DEVELOPER">
-                </div>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Highlight / Subtitle</label>
-                    <input type="text" class="dark-input input-highlight" value="Building intelligent systems & AI solutions">
-                </div>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Description</label>
-                    <textarea class="dark-input input-desc">Developing AI agents, chatbots, and machine learning models using Python, TensorFlow, and PyTorch. Specializing in LLMs, NLP, deep learning, and autonomous systems.</textarea>
-                </div>
-
-                <!-- Tags / Skills Editor -->
-                <div class="dark-input-group">
-                    <label class="dark-label">Skillset & tools</label>
-                    <div class="skills-wrapper">
-                        <!-- Existing Tags -->
-                        <div class="skill-pill">Python <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">TensorFlow <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">PyTorch <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">OpenCV <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">Scikit-learn <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">LLMs <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">NLP <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">Deep Learning <i class="ph ph-x delete-skill"></i></div>
-                        
-                        <!-- Input to add new tags -->
-                        <input type="text" class="add-skill-input" placeholder="+ Type & press Enter">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Role Card 2 -->
-            <div class="role-card">
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
-                
-                <button class="delete-card-btn" title="Delete Role">
-                    <i class="ph ph-trash"></i>
-                </button>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Job Title</label>
-                    <input type="text" class="dark-input input-title" value="FULL-STACK">
-                </div>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Highlight / Subtitle</label>
-                    <input type="text" class="dark-input input-highlight" value="Modern web development & scalable applications">
-                </div>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Description</label>
-                    <textarea class="dark-input input-desc">Building responsive and performant web applications using React, Next.js, Node.js, and modern database architectures.</textarea>
-                </div>
-
-                <div class="dark-input-group">
-                    <label class="dark-label">Skillset & tools</label>
-                    <div class="skills-wrapper">
-                        <div class="skill-pill">React <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">Next.js <i class="ph ph-x delete-skill"></i></div>
-                        <div class="skill-pill">Node.js <i class="ph ph-x delete-skill"></i></div>
-                        <input type="text" class="add-skill-input" placeholder="+ Type & press Enter">
-                    </div>
-                </div>
-            </div>
-
+        <!-- Dynamic Dark Editor Cards -->
+        <div class="cards-container" id="cardsContainer">
+            <i class="ph ph-spinner ph-spin loading-data" id="loadingSpinner"></i>
+            <!-- Cards will be injected here via JavaScript -->
         </div>
     </main>
 
-    <!-- JavaScript for Sidebar and Tag interactions -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Sidebar menu active state logic
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
+    <!-- Firebase Integration & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-            // Logic to delete skills
-            const setupDeleteSkillEvents = () => {
-                document.querySelectorAll('.delete-skill').forEach(btn => {
-                    // Remove old listener to avoid duplicates, then add
-                    btn.onclick = function() {
-                        this.closest('.skill-pill').remove();
-                    };
-                });
-            };
-            setupDeleteSkillEvents();
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhA-AAzP3kf7Zn0c98k0ozlkqk1aST-x0",
+            authDomain: "planning-with-ai-592ee.firebaseapp.com",
+            projectId: "planning-with-ai-592ee",
+            storageBucket: "planning-with-ai-592ee.firebasestorage.app",
+            messagingSenderId: "321067926334",
+            appId: "1:321067926334:web:e9cb315d9eae763e0e626f"
+        };
 
-            // Logic to add new skills via Enter key
-            document.querySelectorAll('.add-skill-input').forEach(input => {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault(); // Stop form submission if inside a form
-                        const val = this.value.trim();
-                        if (val) {
-                            // Create new pill HTML
-                            const pill = document.createElement('div');
-                            pill.className = 'skill-pill';
-                            pill.innerHTML = `${val} <i class="ph ph-x delete-skill"></i>`;
-                            
-                            // Insert before the input field
-                            this.parentNode.insertBefore(pill, this);
-                            
-                            // Clear input
-                            this.value = '';
-                            
-                            // Re-bind delete events for the newly added pill
-                            setupDeleteSkillEvents();
-                        }
-                    }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const userNameEl = document.getElementById('userName');
+        const userEmailEl = document.getElementById('userEmail');
+        const userAvatarEl = document.getElementById('userAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const addRoleBtn = document.getElementById('addRoleBtn');
+        const saveDataBtn = document.getElementById('saveDataBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // --- Firebase Auth Check ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.body.classList.add('auth-ready');
+                
+                // Populate Profile
+                userEmailEl.textContent = user.email;
+                let displayName = user.displayName || user.email.split('@')[0];
+                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+                userNameEl.textContent = displayName;
+                userAvatarEl.src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6842EF&color=fff&bold=true`;
+
+                // Fetch Data from Firestore
+                fetchWhatIDoData();
+
+            } else {
+                // Redirect to login if not authenticated
+                window.location.replace('login.html'); 
+            }
+        });
+
+        // --- Logout ---
+        logoutBtn.addEventListener('click', () => {
+            if(confirm("Are you sure you want to log out?")) {
+                signOut(auth).catch((error) => console.error("Logout Error:", error));
+            }
+        });
+
+        // ==========================================
+        // UI & EVENT DELEGATION FOR CARDS
+        // ==========================================
+
+        // Generate HTML for a single card
+        function createCardHTML(title = '', highlight = '', desc = '', skills = []) {
+            const skillsHTML = skills.map(skill => `<div class="skill-pill">${skill} <i class="ph ph-x delete-skill"></i></div>`).join('');
+            
+            return `
+                <div class="role-card">
+                    <div class="corner corner-tl"></div>
+                    <div class="corner corner-tr"></div>
+                    <div class="corner corner-bl"></div>
+                    <div class="corner corner-br"></div>
+                    
+                    <button class="delete-card-btn" title="Delete Role"><i class="ph ph-trash"></i></button>
+
+                    <div class="dark-input-group">
+                        <label class="dark-label">Job Title</label>
+                        <input type="text" class="dark-input input-title" value="${title}" placeholder="e.g. AI DEVELOPER">
+                    </div>
+
+                    <div class="dark-input-group">
+                        <label class="dark-label">Highlight / Subtitle</label>
+                        <input type="text" class="dark-input input-highlight" value="${highlight}" placeholder="e.g. Building intelligent systems">
+                    </div>
+
+                    <div class="dark-input-group">
+                        <label class="dark-label">Description</label>
+                        <textarea class="dark-input input-desc" placeholder="Describe the role...">${desc}</textarea>
+                    </div>
+
+                    <div class="dark-input-group">
+                        <label class="dark-label">Skillset & tools</label>
+                        <div class="skills-wrapper">
+                            ${skillsHTML}
+                            <input type="text" class="add-skill-input" placeholder="+ Type & press Enter">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Handle Add New Role
+        addRoleBtn.addEventListener('click', () => {
+            cardsContainer.insertAdjacentHTML('afterbegin', createCardHTML());
+        });
+
+        // Event Delegation for Deleting Cards, Deleting Skills, and Adding Skills via Enter
+        cardsContainer.addEventListener('click', (e) => {
+            // Delete Card
+            if (e.target.closest('.delete-card-btn')) {
+                if(confirm("Delete this role?")) {
+                    e.target.closest('.role-card').remove();
+                }
+            }
+            // Delete Skill Pill
+            if (e.target.closest('.delete-skill')) {
+                e.target.closest('.skill-pill').remove();
+            }
+        });
+
+        // Handle 'Enter' key on skill inputs
+        cardsContainer.addEventListener('keypress', (e) => {
+            if (e.target.classList.contains('add-skill-input') && e.key === 'Enter') {
+                e.preventDefault();
+                const val = e.target.value.trim();
+                if (val) {
+                    const pillHTML = `<div class="skill-pill">${val} <i class="ph ph-x delete-skill"></i></div>`;
+                    e.target.insertAdjacentHTML('beforebegin', pillHTML);
+                    e.target.value = '';
+                }
+            }
+        });
+
+        // ==========================================
+        // FIRESTORE LOGIC: FETCH & SAVE
+        // ==========================================
+
+        async function fetchWhatIDoData() {
+            loadingSpinner.style.display = 'block';
+            cardsContainer.innerHTML = ''; // clear current
+
+            try {
+                const docRef = doc(db, "portfolio", "whatIDo");
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists() && docSnap.data().roles) {
+                    const roles = docSnap.data().roles;
+                    let allHtml = '';
+                    roles.forEach(role => {
+                        allHtml += createCardHTML(role.title, role.highlight, role.description, role.skills);
+                    });
+                    cardsContainer.innerHTML = allHtml;
+                } else {
+                    // Default template if no data exists
+                    cardsContainer.innerHTML = createCardHTML("AI DEVELOPER", "Building intelligent systems", "Developing AI agents...", ["Python", "TensorFlow"]);
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                cardsContainer.innerHTML = `<p style="color:white;text-align:center;">Failed to load data.</p>`;
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        saveDataBtn.addEventListener('click', async () => {
+            const originalText = saveDataBtn.innerHTML;
+            saveDataBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
+            saveDataBtn.disabled = true;
+
+            try {
+                // Gather data from DOM
+                const roles = [];
+                document.querySelectorAll('.role-card').forEach(card => {
+                    const title = card.querySelector('.input-title').value.trim();
+                    const highlight = card.querySelector('.input-highlight').value.trim();
+                    const description = card.querySelector('.input-desc').value.trim();
+                    
+                    const skills = [];
+                    card.querySelectorAll('.skill-pill').forEach(pill => {
+                        // Extract text content and remove trailing whitespace from HTML format
+                        skills.push(pill.textContent.trim());
+                    });
+
+                    roles.push({ title, highlight, description, skills });
                 });
-            });
+
+                // Save to Firestore array
+                await setDoc(doc(db, "portfolio", "whatIDo"), { roles, lastUpdated: new Date() });
+
+                // Success State
+                saveDataBtn.innerHTML = '<i class="ph ph-check"></i> Saved!';
+                saveDataBtn.style.backgroundColor = '#10B981';
+
+                setTimeout(() => {
+                    saveDataBtn.innerHTML = originalText;
+                    saveDataBtn.style.backgroundColor = '';
+                    saveDataBtn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error saving data:", error);
+                alert("Failed to save changes. Make sure your Firestore Security Rules allow writes.");
+                saveDataBtn.innerHTML = originalText;
+                saveDataBtn.disabled = false;
+            }
         });
     </script>
-
 </body>
 </html>
